@@ -1,30 +1,44 @@
 use std::io;
-use rand::Rng;
-use std::cmp::Ordering;
 fn main() {
-    let secret_number = rand::thread_rng()
-        .gen_range(1..=100);
-    loop {
-        println!("Guess the number!");
-        println!("Please eneter your guess.");
+    use std::time::Instant;
+    println!("Please eneter your number.");
         let mut guess = String::new();
         io::stdin()
             .read_line(&mut guess)
             .expect("Failed to read line");
-        println!("You guessed: {guess}");
-        let guess: u32 = match guess.trim().parse() {
+        println!("Your number: {guess}");
+        let num: u64 = match guess.trim().parse() {
             Ok(num) => num,
-            Err(_) => continue,
-
+            Err(_) => 1,
         };
+    let now = Instant::now();
+    // Code block to measure.
+    let res = lowest_multiple(num);
 
-        match guess.cmp(&secret_number) {
-            Ordering::Less => println!("To small!"),
-            Ordering::Greater => println!("To big!"),
-            Ordering::Equal => {
-                println!("You win!");
-                break
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
+    println!("number was: {}", res)
+
+    }
+
+
+fn lowest_multiple(inp: u64) -> u64{
+    let mut current:u64 = 0;
+    const NUMBERS: [char; 2] = ['0','1'];
+    let mut curr_string = String::new();
+    let mut passing: bool = true;
+    let result = loop {
+        current = current + inp;
+        curr_string = current.to_string();
+        passing = true;
+        for cha in curr_string.chars() {
+            if !NUMBERS.contains(&cha) {
+                passing = false;
             }
         }
-    }
+        if passing {
+            break current
+        }
+    };
+    result
 }
